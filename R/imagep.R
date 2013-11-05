@@ -415,13 +415,8 @@ imagep <- function(x, y, z,
             .filled.contour(as.double(xorig), as.double(yorig), z, as.double(breaks), col=col)
             mtext(ylab, side=2, line=par('mgp')[1])
         } else {
-            if (!breaksGiven) {
-                image(x=x, y=y, z=z, axes=FALSE, xlab="", ylab=ylab, col=col,
-                      xlim=xlim, ylim=ylim, zlim=zlim, ...)
-            } else {
-                image(x=x, y=y, z=z, axes=FALSE, xlab="", ylab=ylab, breaks=breaks, col=col,
-                      xlim=xlim, ylim=ylim, zlim=zlim, ...)
-            }
+            image(x=x, y=y, z=z, axes=FALSE, xlab="", ylab=ylab, breaks=breaks, col=col,
+                  xlim=xlim, ylim=ylim, zlim=zlim, ...)
         }
         if (axes) {
             box()
@@ -458,7 +453,7 @@ imagep <- function(x, y, z,
     if (!(is.character(main) && main == ""))
         mtext(main, at=mean(range(x), na.rm=TRUE), side=3, line=1/8, cex=par("cex"))
     if (drawContours)
-        contour(x=x, y=y, z=z, levels=breaks, drawlabels=FALSE, add=TRUE, col="black")
+        contour(x=xorig, y=yorig, z=z, levels=breaks, drawlabels=FALSE, add=TRUE, col="black")
     if (zlabPosition == "top")
         mtext(zlab, side=3, cex=par("cex"), adj=1, line=1/8)
     if (!missing(adorn)) {
