@@ -1298,10 +1298,19 @@ drawDirectionField <- function(x, y, u, v, scalex, scaley, add=FALSE,
     oceDebug(debug, "\b\b} # drawDirectionField\n")
 }
 
-oceContour <- function(x, y, z, revx=FALSE, revy=FALSE, ...)
+oceContour <- function(x, y, z, revx=FALSE, revy=FALSE, debug=getOption("oceDebug"), ...)
 {
     dots <- list(...)
     dotsNames <- names(dots)
+    mustReverseX <- any(0 > diff(order(x)))
+    mustReverseY <- any(0 > diff(order(y)))
+    oceDebug(debug, "mustReverseX:", mustReverseX, '\n')
+    oceDebug(debug, "mustReverseY:", mustReverseY, '\n')
+    if (mustReverseY) {
+        rows <- seq.int(dim(z)[2], 1)
+        ##z <- z[,rows]
+        y <- y[rows]
+    }
     if ("add" %in% dotsNames) {
         contour(x, y, z, ...)
     } else {
@@ -1331,14 +1340,30 @@ oceContour <- function(x, y, z, revx=FALSE, revy=FALSE, ...)
             contour(x, y, z, axes=FALSE, ...)
             ## see src/library/graphics/R/contour.R 
             xaxp <- par('xaxp')
-            xat <- seq(xaxp[1], xaxp[2], length.out=-1+xaxp[3])
+            xat <- seq(xaxp[1], xaxp[2], length.out=xaxp[3])
             xlabels <- format(xat)
             yaxp <- par('yaxp')
-            yat <- seq(yaxp[1], yaxp[2], length.out=-1+yaxp[3])
+            yat <- seq(yaxp[1], yaxp[2], length.out=yaxp[3])
+            oceDebug(debug, "xat:", xat, "\n")
+            oceDebug(debug, "yat:", yat, "\n")
             ylabels <- format(yat)
+            if (mustReverseY)
+                revy <- !revy
             ##print(data.frame(yat, ylabels))
-            if (revx) Axis(x, side=1, at=xat, labels=rev(xlabels)) else Axis(x, side=1)
-            if (revy) Axis(y, side=2, at=yat, labels=rev(ylabels)) else Axis(y, side=2)
+            if (revx) {
+                Axis(x, side=1, at=xat, labels=rev(xlabels))
+            } else {
+                Axis(x, side=1)
+            }
+            if (revy) {
+                oceDebug(debug, "yat:", yat, "\n")
+                oceDebug(debug, "rev(ylabels):", rev(ylabels), "\n")
+                Axis(y, side=2, at=yat, labels=rev(ylabels))
+            } else {
+                oceDebug(debug, "yat:", yat, "\n")
+                oceDebug(debug, "ylabels:", ylabels, "\n")
+                Axis(y, side=2)
+            }
             box()
         } else {
             contour(x, y, z, ...)
